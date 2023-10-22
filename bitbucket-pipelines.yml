@@ -1,0 +1,24 @@
+image: php:8.2-fpm
+
+pipelines:
+    default:
+        - step:
+              script:
+                  - apt-get update && apt-get install -y libzip-dev unzip
+                  - docker-php-ext-install zip
+                  - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+                  - composer install
+                  - cp .env.example .env
+                  - php artisan key:generate
+                  - php artisan migrate
+                  - php artisan test
+
+definitions:
+    services:
+        mysql:
+            image: mysql:8.0
+            environment:
+                MYSQL_DATABASE: 'testing'
+                MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+                MYSQL_USER: 'laravel'
+                MYSQL_PASSWORD: 'secret'

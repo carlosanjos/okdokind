@@ -1,0 +1,29 @@
+version: "3"
+services:
+    # PHP-FPM service with Supervisor
+    php-fpm:
+        build:
+            context: .
+            dockerfile: bin/Dockerfile
+        container_name: laravel-php-fpm
+        volumes:
+            - ./:/var/www
+        networks:
+            - laravel-network
+
+    # Nginx service
+    nginx:
+        image: nginx:latest
+        container_name: laravel-nginx
+        volumes:
+            - ./:/var/www
+            - ./bin/nginx.conf:/etc/nginx/conf.d/default.conf
+        ports:
+            - "80:80"
+        depends_on:
+            - php-fpm
+        networks:
+            - laravel-network
+
+networks:
+    laravel-network:
